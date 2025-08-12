@@ -80,7 +80,7 @@ app.post('/api/transcribe', async (req, res) => {
   res.setHeader('Content-Type', 'text/plain');
   res.setHeader('Transfer-Encoding', 'chunked');
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  const { audioUrl } = req.body;
+  const { audioUrl, title, pubDate, guid, description } = req.body;
   if (!audioUrl) return res.status(400).json({ error: 'audioUrl required' });
   try {
     console.log('Checking audio file size...');
@@ -173,6 +173,10 @@ app.post('/api/transcribe', async (req, res) => {
     const transcriptData = {
       timestamp: new Date().toISOString(),
       audioUrl,
+      title: title || 'Unknown Episode',
+      pubDate: pubDate || new Date().toISOString(),
+      guid: guid || null,
+      description: description || null,
       transcript: deepgramResp.data
     };
     

@@ -89,7 +89,13 @@ function App() {
         const resp = await fetch('/api/transcribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ audioUrl: ep.audioUrl }),
+          body: JSON.stringify({ 
+            audioUrl: ep.audioUrl,
+            title: ep.title,
+            pubDate: ep.pubDate,
+            guid: ep.guid,
+            description: ep.description
+          }),
         });
 
         console.log('Response received:', resp);
@@ -176,6 +182,8 @@ function App() {
     setLoading(false);
     // Reset selection after transcription is complete
     setSelected([]);
+    // Reload saved transcripts to show newly completed ones
+    loadSavedTranscripts();
   };
 
   // Group episodes by year
@@ -449,6 +457,34 @@ function App() {
                           onMouseOut={(e) => e.target.style.background = 'var(--primary-color)'}
                         >
                           View Transcript
+                        </button>
+                        <button
+                          onClick={() => {
+                            const content = formatTranscriptWithSpeakers(transcript.transcript);
+                            const blob = new Blob([content], { type: 'text/plain' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${transcript.title || episodeTitle || 'transcript'}.txt`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          }}
+                          style={{
+                            background: 'var(--text-secondary)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '0.5rem 1rem',
+                            borderRadius: 'var(--border-radius-sm)',
+                            cursor: 'pointer',
+                            fontSize: '0.8rem',
+                            fontWeight: '500',
+                            marginLeft: '0.5rem',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          Download
                         </button>
                       </div>
                     );
