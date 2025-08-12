@@ -5,7 +5,8 @@
   "main": "public/index.html",
   "type": "module",
   "scripts": {
-    "build": "echo 'Build complete - static files ready'",
+    "build": "cd frontend && npm install && npm run build",
+    "start:prod": "cd backend && npm install && node server.js",
     "dev": "http-server public -p 8080",
     "backend": "node backend/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"

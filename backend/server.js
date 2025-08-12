@@ -252,6 +252,17 @@ app.post('/api/transcript/find', (req, res) => {
   }
 });
 
+// Serve React frontend in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendBuildPath = path.join(__dirname, '../frontend/build');
+  app.use(express.static(frontendBuildPath));
+  
+  // Handle React Router - send all non-API requests to React
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`Backend listening on port ${PORT}`);
 });
