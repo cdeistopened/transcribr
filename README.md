@@ -1,5 +1,7 @@
 # Transcribr 🎙️
 
+> Full-featured podcast transcription tool with episode selection and queue management
+
 A web-based tool for batch transcribing podcast episodes from RSS feeds using AI transcription services.
 
 ![Transcription Demo](https://img.shields.io/badge/Status-Active-green)
