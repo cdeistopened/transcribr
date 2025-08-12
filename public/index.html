@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcribr - RSS Feed Transcription Tool</title>
+    <meta name="description" content="Transform podcast episodes into readable transcripts with AI-powered transcription">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .input-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .status {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .episodes-section {
+            margin-top: 30px;
+        }
+        
+        .episodes-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .episodes-grid {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .episode-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .episode-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .episode-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .episode-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .episode-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+        
+        .episode-info {
+            flex: 1;
+        }
+        
+        .episode-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .episode-date {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .episode-duration {
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .transcribe-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+        }
+        
+        .progress-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            text-align: left;
+        }
+        
+        .progress-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .progress-status {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎙️ Transcribr</h1>
+            <p>Transform podcast episodes into readable transcripts with AI-powered transcription</p>
+        </header>
+        
+        <main class="main-content">
+            <section class="input-section">
+                <h2>RSS Feed Input</h2>
+                <div class="input-group">
+                    <input 
+                        type="url" 
+                        id="rssUrl" 
+                        placeholder="Enter your podcast RSS feed URL (e.g., https://example.com/feed.xml)"
+                        value=""
+                    >
+                    <button class="btn" onclick="fetchEpisodes()" id="fetchBtn">
+                        <span id="fetchBtnText">Fetch Episodes</span>
+                        <span id="fetchBtnLoader" class="loading" style="display: none;"></span>
+                    </button>
+                </div>
+                <div id="fetchStatus"></div>
+            </section>
+            
+            <section class="episodes-section" id="episodesSection" style="display: none;">
+                <h2>Select Episodes to Transcribe</h2>
+                <div id="episodesList" class="episodes-grid"></div>
+            </section>
+            
+            <section class="transcribe-section" id="transcribeSection" style="display: none;">
+                <h2>Transcription</h2>
+                <button class="btn" onclick="transcribeSelected()" id="transcribeBtn" disabled>
+                    Start Transcription
+                </button>
+                <div id="transcriptionProgress" class="progress-container"></div>
+            </section>
+        </main>
+        
+        <footer class="footer">
+            <p>Built with ❤️ for podcast enthusiasts • Powered by AI transcription</p>
+        </footer>
+    </div>
+
+    <script>
+        let episodes = [];
+        // For local development, use the full URL to the backend
+        const API_BASE = 'http://localhost:4000/api'; // Use this for local testing
+        // const API_BASE = '/api'; // Use this for production deployment
+        
+        // Show status messages
+        function showStatus(elementId, message, type) {
+            const statusDiv = document.getElementById(elementId);
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = message;
+        }
+        
+        // Show loading state
+        function setLoading(buttonId, loading) {
+            const btn = document.getElementById(buttonId);
+            const text = document.getElementById(buttonId + 'Text');
+            const loader = document.getElementById(buttonId + 'Loader');
+            
+            if (loading) {
+                btn.disabled = true;
+                text.style.display = 'none';
+                loader.style.display = 'inline-block';
+            } else {
+                btn.disabled = false;
+                text.style.display = 'inline';
+                loader.style.display = 'none';
+            }
+        }
+        
+        // Fetch episodes from RSS feed
+        async function fetchEpisodes() {
+            const rssUrl = document.getElementById('rssUrl').value.trim();
+            
+            if (!rssUrl) {
+                showStatus('fetchStatus', '❌ Please enter an RSS feed URL', 'error');
+                return;
+            }
+            
+            setLoading('fetchBtn', true);
+            showStatus('fetchStatus', '🔄 Fetching episodes from RSS feed...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/rss`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ rssUrl })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                episodes = data.episodes || [];
+                
+                if (episodes.length === 0) {
+                    showStatus('fetchStatus', '⚠️ No episodes found in this RSS feed', 'warning');
+                    return;
+                }
+                
+                showStatus('fetchStatus', `✅ Successfully loaded ${episodes.length} episodes`, 'success');
+                displayEpisodes();
+                
+            } catch (error) {
+                console.error('Error fetching episodes:', error);
+                showStatus('fetchStatus', `❌ Failed to fetch episodes: ${error.message}`, 'error');
+            } finally {
+                setLoading('fetchBtn', false);
+            }
+        }
+        
+        // Display episodes
+        function displayEpisodes() {
+            const episodesList = document.getElementById('episodesList');
+            const episodesSection = document.getElementById('episodesSection');
+            const transcribeSection = document.getElementById('transcribeSection');
+            
+            if (episodes.length === 0) {
+                episodesList.innerHTML = '<p>No episodes available.</p>';
+                return;
+            }
+            
+            episodesList.innerHTML = episodes.map((episode, index) => `
+                <div class="episode-card" onclick="toggleEpisode(${index})">
+                    <div class="episode-header">
+                        <input 
+                            type="checkbox" 
+                            class="episode-checkbox" 
+                            id="episode-${index}"
+                            onchange="updateTranscribeButton()"
+                            onclick="event.stopPropagation()"
+                        >
+                        <div class="episode-info">
+                            <div class="episode-title">${escapeHtml(episode.title)}</div>
+                            <div class="episode-date">📅 ${new Date(episode.pubDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            })}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            episodesSection.style.display = 'block';
+            transcribeSection.style.display = 'block';
+            updateTranscribeButton();
+        }
+        
+        // Toggle episode selection
+        function toggleEpisode(index) {
+            const checkbox = document.getElementById(`episode-${index}`);
+            const card = checkbox.closest('.episode-card');
+            
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+            
+            updateTranscribeButton();
+        }
+        
+        // Update transcribe button state
+        function updateTranscribeButton() {
+            const checkboxes = document.querySelectorAll('.episode-checkbox:checked');
+            const transcribeBtn = document.getElementById('transcribeBtn');
+            
+            transcribeBtn.disabled = checkboxes.length === 0;
+            transcribeBtn.textContent = checkboxes.length === 0 
+                ? 'Select episodes to transcribe' 
+                : `Transcribe ${checkboxes.length} episode${checkboxes.length > 1 ? 's' : ''}`;
+        }
+        
+        // Transcribe selected episodes
+        async function transcribeSelected() {
+            const checkboxes = document.querySelectorAll('.episode-checkbox:checked');
+            const selectedEpisodes = Array.from(checkboxes).map(cb => {
+                const index = parseInt(cb.id.split('-')[1]);
+                return { ...episodes[index], index };
+            });
+            
+            if (selectedEpisodes.length === 0) {
+                showStatus('transcriptionProgress', '❌ Please select at least one episode', 'error');
+                return;
+            }
+            
+            const progressDiv = document.getElementById('transcriptionProgress');
+            const transcribeBtn = document.getElementById('transcribeBtn');
+            
+            transcribeBtn.disabled = true;
+            progressDiv.innerHTML = '';
+            
+            for (let i = 0; i < selectedEpisodes.length; i++) {
+                const episode = selectedEpisodes[i];
+                await transcribeEpisode(episode, i + 1, selectedEpisodes.length);
+            }
+            
+            transcribeBtn.disabled = false;
+            updateTranscribeButton();
+        }
+        
+        // Transcribe a single episode
+        async function transcribeEpisode(episode, current, total) {
+            const progressDiv = document.getElementById('transcriptionProgress');
+            const progressItem = document.createElement('div');
+            progressItem.className = 'progress-item';
+            progressItem.innerHTML = `
+                <div class="progress-title">Episode ${current}/${total}: ${escapeHtml(episode.title)}</div>
+                <div class="progress-status" id="progress-${current}">🔄 Starting transcription...</div>
+            `;
+            progressDiv.appendChild(progressItem);
+            
+            try {
+                const response = await fetch(`${API_BASE}/transcribe`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ audioUrl: episode.audioUrl })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                const progressSpan = document.getElementById(`progress-${current}`);
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\\n').filter(line => line.trim());
+                    
+                    for (const line of lines) {
+                        try {
+                            const update = JSON.parse(line);
+                            if (update.message) {
+                                progressSpan.textContent = update.message;
+                            }
+                            if (update.status === 'complete') {
+                                progressSpan.innerHTML = '✅ <strong>Transcription complete!</strong>';
+                            } else if (update.status === 'error') {
+                                progressSpan.innerHTML = `❌ <strong>Error:</strong> ${update.message}`;
+                            }
+                        } catch (e) {
+                            // Ignore JSON parsing errors for incomplete chunks
+                        }
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error transcribing episode:', error);
+                const progressSpan = document.getElementById(`progress-${current}`);
+                progressSpan.innerHTML = `❌ <strong>Error:</strong> ${error.message}`;
+            }
+        }
+        
+        // Utility function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            // Add example RSS feeds for testing
+            const rssInput = document.getElementById('rssUrl');
+            rssInput.placeholder = 'Enter RSS feed URL (e.g., https://feeds.npr.org/510289/podcast.xml)';
+        });
+    </script>
+</body>
+</html>
