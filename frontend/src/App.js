@@ -2,10 +2,11 @@ import React, { useState, useMemo } from 'react';
 import './App.css';
 
 function App() {
-  const [rssUrl, setRssUrl] = useState('');
+  const [rssUrl, setRssUrl] = useState('http://naval.libsyn.com/rss');
   const [episodes, setEpisodes] = useState([]);
   const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
   const [transcripts, setTranscripts] = useState({});
   const [selectedYear, setSelectedYear] = useState(null);
   const [savedTranscripts, setSavedTranscripts] = useState([]);
@@ -66,7 +67,7 @@ function App() {
   const transcribeSelected = async () => {
     console.log('Starting transcription for selected episodes...');
     console.log('Selected episodes:', episodes.filter(e => selected.includes(e.guid)));
-    setLoading(true);
+    setTranscribing(true);
     for (const ep of episodes.filter(e => selected.includes(e.guid))) {
       try {
         // First check if we already have this transcript saved
@@ -169,7 +170,7 @@ function App() {
 
         setProgress(prev => ({
           ...prev,
-          [ep.guid]: { status: 'complete', message: 'Transcription complete!' }
+          [ep.guid]: { status: 'complete', message: 'Transcription complete! Available in saved transcripts.' }
         }));
       } catch (err) {
         console.error('Transcription error:', err);
@@ -179,7 +180,7 @@ function App() {
         }));
       }
     }
-    setLoading(false);
+    setTranscribing(false);
     // Reset selection after transcription is complete
     setSelected([]);
     // Reload saved transcripts to show newly completed ones
@@ -272,6 +273,12 @@ function App() {
     window.URL.revokeObjectURL(url);
   };
 
+  const clearQueue = () => {
+    setTranscripts({});
+    setProgress({});
+    setSelected([]);
+  };
+
   // Load saved transcripts when component mounts
   React.useEffect(() => {
     loadSavedTranscripts();
@@ -297,7 +304,7 @@ function App() {
                 type="text"
                 value={rssUrl}
                 onChange={e => setRssUrl(e.target.value)}
-                placeholder="https://example.com/podcast/feed.xml"
+                placeholder="Enter podcast RSS feed URL or try the pre-filled Naval example"
                 className="rss-input"
                 onKeyPress={e => e.key === 'Enter' && !loading && rssUrl && fetchEpisodes()}
               />
@@ -313,7 +320,7 @@ function App() {
                 {loading ? (
                   <>
                     <span className="loading-spinner"></span>
-                    Loading Episodes...
+                    Fetching Episodes...
                   </>
                 ) : (
                   'Fetch Episodes'
@@ -470,10 +477,11 @@ function App() {
           <div className="transcribe-section">
             <button 
               onClick={transcribeSelected} 
-              disabled={loading || selected.length === 0}
+              disabled={transcribing || selected.length === 0}
               className="transcribe-button"
+              style={{ marginBottom: '0.75rem' }}
             >
-              {loading ? (
+              {transcribing ? (
                 <>
                   <span className="loading-spinner"></span>
                   Transcribing...
@@ -482,6 +490,26 @@ function App() {
                 `Transcribe ${selected.length} Episode${selected.length !== 1 ? 's' : ''}`
               )}
             </button>
+            
+            {(Object.keys(transcripts).length > 0 || Object.keys(progress).length > 0) && (
+              <button 
+                onClick={clearQueue}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  fontSize: '0.85rem',
+                  fontWeight: '500',
+                  background: 'var(--text-secondary)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 'var(--border-radius)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                🗑️ Clear Queue
+              </button>
+            )}
           </div>
 
           {/* Saved Transcripts Section - Moved to Transcription Panel */}
