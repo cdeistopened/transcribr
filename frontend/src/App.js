@@ -41,6 +41,7 @@ function App() {
   };
 
   const fetchEpisodes = async () => {
+    console.log('fetchEpisodes called with URL:', rssUrl);
     setLoading(true);
     setEpisodes([]);
     setSelected([]);
@@ -219,6 +220,9 @@ function App() {
   }, [episodes, selected]);
 
   const toggleTranscript = (guid) => {
+    console.log('toggleTranscript called with guid:', guid);
+    console.log('Available transcripts:', Object.keys(transcripts));
+    console.log('Current expanded state:', expandedTranscripts[guid]);
     setExpandedTranscripts(prev => ({
       ...prev,
       [guid]: !prev[guid]
@@ -308,6 +312,7 @@ function App() {
                 onKeyPress={e => e.key === 'Enter' && !loading && rssUrl && fetchEpisodes()}
               />
               <button 
+                type="button"
                 onClick={fetchEpisodes} 
                 disabled={loading || !rssUrl}
                 className="rss-button"
