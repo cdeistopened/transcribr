@@ -308,14 +308,40 @@ function App() {
                 className="rss-input"
                 onKeyPress={e => e.key === 'Enter' && !loading && rssUrl && fetchEpisodes()}
               />
-              <button 
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  fetchEpisodes();
-                }} 
-                disabled={loading || !rssUrl}
-                className="rss-button"
+              <div 
+                onClick={() => {
+                  if (!loading && rssUrl) {
+                    fetchEpisodes();
+                  }
+                }}
+                style={{
+                  padding: '1rem 2rem',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  background: 'white',
+                  color: '#2563eb',
+                  border: 'none',
+                  borderRadius: '16px',
+                  cursor: (loading || !rssUrl) ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  userSelect: 'none',
+                  opacity: (loading || !rssUrl) ? 0.6 : 1,
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading && rssUrl) {
+                    e.target.style.transform = 'translateY(-1px)';
+                    e.target.style.boxShadow = '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)';
+                }}
               >
                 {loading ? (
                   <>
@@ -325,7 +351,7 @@ function App() {
                 ) : (
                   'Fetch Episodes'
                 )}
-              </button>
+              </div>
             </div>
           </div>
 
