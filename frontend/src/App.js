@@ -8,7 +8,6 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [transcripts, setTranscripts] = useState({});
   const [selectedYear, setSelectedYear] = useState(null);
-  const [expandedTranscripts, setExpandedTranscripts] = useState({});
   const [savedTranscripts, setSavedTranscripts] = useState([]);
   const [showSavedTranscripts, setShowSavedTranscripts] = useState(false);
   const [progress, setProgress] = useState({});
@@ -219,15 +218,6 @@ function App() {
     return episodes.filter(ep => selected.includes(ep.guid));
   }, [episodes, selected]);
 
-  const toggleTranscript = (guid) => {
-    console.log('toggleTranscript called with guid:', guid);
-    console.log('Available transcripts:', Object.keys(transcripts));
-    console.log('Current expanded state:', expandedTranscripts[guid]);
-    setExpandedTranscripts(prev => ({
-      ...prev,
-      [guid]: !prev[guid]
-    }));
-  };
 
   const formatTranscriptWithSpeakers = (transcript) => {
     if (!transcript?.results?.channels?.[0]?.alternatives?.[0]) return '';
@@ -313,7 +303,10 @@ function App() {
               />
               <button 
                 type="button"
-                onClick={fetchEpisodes} 
+                onClick={(e) => {
+                  e.preventDefault();
+                  fetchEpisodes();
+                }} 
                 disabled={loading || !rssUrl}
                 className="rss-button"
               >
@@ -449,55 +442,23 @@ function App() {
                   {transcripts[ep.guid] && (
                     <div style={{ marginTop: '0.5rem' }}>
                       <button 
-                        onClick={() => toggleTranscript(ep.guid)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          downloadTranscript(ep.guid);
+                        }}
                         style={{
                           background: 'var(--accent-color)',
                           color: 'white',
                           border: 'none',
-                          padding: '0.25rem 0.5rem',
+                          padding: '0.5rem 1rem',
                           borderRadius: 'var(--border-radius-sm)',
                           cursor: 'pointer',
                           fontSize: '0.8rem',
-                          marginRight: '0.5rem'
+                          fontWeight: '500'
                         }}
                       >
-                        {expandedTranscripts[ep.guid] ? 'Hide' : 'View'}
+                        📥 Download Transcript
                       </button>
-                      <button 
-                        onClick={() => downloadTranscript(ep.guid)}
-                        style={{
-                          background: 'var(--text-secondary)',
-                          color: 'white',
-                          border: 'none',
-                          padding: '0.25rem 0.5rem',
-                          borderRadius: 'var(--border-radius-sm)',
-                          cursor: 'pointer',
-                          fontSize: '0.8rem'
-                        }}
-                      >
-                        Download
-                      </button>
-                      {expandedTranscripts[ep.guid] && (
-                        <div style={{
-                          marginTop: '0.5rem',
-                          padding: '0.75rem',
-                          background: 'white',
-                          borderRadius: 'var(--border-radius-sm)',
-                          maxHeight: '200px',
-                          overflowY: 'auto',
-                          fontSize: '0.8rem',
-                          lineHeight: '1.4',
-                          border: '1px solid var(--border-color)'
-                        }}>
-                          <pre style={{ 
-                            whiteSpace: 'pre-wrap', 
-                            margin: 0,
-                            fontFamily: 'inherit'
-                          }}>
-                            {formatTranscriptWithSpeakers(transcripts[ep.guid])}
-                          </pre>
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
@@ -585,30 +546,6 @@ function App() {
                           })}
                         </div>
                         <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const guid = transcript.audioUrl;
-                            setTranscripts(prev => ({ ...prev, [guid]: transcript.transcript }));
-                            setExpandedTranscripts(prev => ({ ...prev, [guid]: true }));
-                          }}
-                          style={{
-                            background: 'var(--primary-color)',
-                            color: 'white',
-                            border: 'none',
-                            padding: '0.4rem 0.8rem',
-                            borderRadius: 'var(--border-radius-sm)',
-                            cursor: 'pointer',
-                            fontSize: '0.7rem',
-                            fontWeight: '500',
-                            transition: 'all 0.2s ease'
-                          }}
-                          onMouseOver={(e) => e.target.style.background = 'var(--primary-hover)'}
-                          onMouseOut={(e) => e.target.style.background = 'var(--primary-color)'}
-                        >
-                          View
-                        </button>
-                        <button
                           onClick={() => {
                             const content = formatTranscriptWithSpeakers(transcript.transcript);
                             const blob = new Blob([content], { type: 'text/plain' });
@@ -622,19 +559,18 @@ function App() {
                             URL.revokeObjectURL(url);
                           }}
                           style={{
-                            background: 'var(--text-secondary)',
+                            background: 'var(--accent-color)',
                             color: 'white',
                             border: 'none',
-                            padding: '0.4rem 0.8rem',
+                            padding: '0.6rem 1.2rem',
                             borderRadius: 'var(--border-radius-sm)',
                             cursor: 'pointer',
-                            fontSize: '0.7rem',
+                            fontSize: '0.8rem',
                             fontWeight: '500',
-                            marginLeft: '0.5rem',
                             transition: 'all 0.2s ease'
                           }}
                         >
-                          Download
+                          📥 Download Transcript
                         </button>
                       </div>
                     );
