@@ -380,124 +380,7 @@ function App() {
             </div>
           )}
 
-          {/* Saved Transcripts Section */}
-          {savedTranscripts.length > 0 && (
-            <div style={{ padding: '2rem' }}>
-              <button 
-                onClick={() => setShowSavedTranscripts(!showSavedTranscripts)}
-                style={{ 
-                  background: 'none', 
-                  border: '1px solid var(--border-color)', 
-                  padding: '0.5rem 1rem',
-                  borderRadius: 'var(--border-radius-sm)',
-                  cursor: 'pointer',
-                  marginBottom: '1rem'
-                }}
-              >
-                {showSavedTranscripts ? 'Hide' : 'Show'} Saved Transcripts ({savedTranscripts.length})
-              </button>
 
-              {showSavedTranscripts && (
-                <div style={{ 
-                  background: 'var(--secondary-color)', 
-                  padding: '1rem', 
-                  borderRadius: 'var(--border-radius)',
-                  maxHeight: '300px',
-                  overflowY: 'auto'
-                }}>
-                  {savedTranscripts.map((transcript, index) => {
-                    // Try to extract episode title from the transcript data or URL
-                    const episodeTitle = transcript.episodeTitle || 
-                                       episodes.find(ep => ep.audioUrl === transcript.audioUrl)?.title || 
-                                       'Unknown Episode';
-                    
-                    return (
-                      <div key={index} style={{ 
-                        background: 'white', 
-                        padding: '1rem', 
-                        marginBottom: '0.5rem',
-                        borderRadius: 'var(--border-radius-sm)',
-                        fontSize: '0.9rem',
-                        border: '1px solid var(--border-color)'
-                      }}>
-                        <div style={{ 
-                          fontWeight: '600', 
-                          marginBottom: '0.5rem',
-                          color: 'var(--text-primary)',
-                          lineHeight: '1.3'
-                        }}>
-                          {episodeTitle}
-                        </div>
-                        <div style={{ 
-                          marginBottom: '0.75rem', 
-                          color: 'var(--text-secondary)',
-                          fontSize: '0.8rem'
-                        }}>
-                          Transcribed: {new Date(transcript.timestamp).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const guid = transcript.audioUrl;
-                            setTranscripts(prev => ({ ...prev, [guid]: transcript.transcript }));
-                            setExpandedTranscripts(prev => ({ ...prev, [guid]: true }));
-                          }}
-                          style={{
-                            background: 'var(--primary-color)',
-                            color: 'white',
-                            border: 'none',
-                            padding: '0.5rem 1rem',
-                            borderRadius: 'var(--border-radius-sm)',
-                            cursor: 'pointer',
-                            fontSize: '0.8rem',
-                            fontWeight: '500',
-                            transition: 'all 0.2s ease'
-                          }}
-                          onMouseOver={(e) => e.target.style.background = 'var(--primary-hover)'}
-                          onMouseOut={(e) => e.target.style.background = 'var(--primary-color)'}
-                        >
-                          View Transcript
-                        </button>
-                        <button
-                          onClick={() => {
-                            const content = formatTranscriptWithSpeakers(transcript.transcript);
-                            const blob = new Blob([content], { type: 'text/plain' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${transcript.title || episodeTitle || 'transcript'}.txt`;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                          }}
-                          style={{
-                            background: 'var(--text-secondary)',
-                            color: 'white',
-                            border: 'none',
-                            padding: '0.5rem 1rem',
-                            borderRadius: 'var(--border-radius-sm)',
-                            cursor: 'pointer',
-                            fontSize: '0.8rem',
-                            fontWeight: '500',
-                            marginLeft: '0.5rem',
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          Download
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Fixed Transcription Panel */}
@@ -639,6 +522,127 @@ function App() {
               )}
             </button>
           </div>
+
+          {/* Saved Transcripts Section - Moved to Transcription Panel */}
+          {savedTranscripts.length > 0 && (
+            <div style={{ padding: '1rem', borderTop: '1px solid var(--border-color)' }}>
+              <button 
+                onClick={() => setShowSavedTranscripts(!showSavedTranscripts)}
+                style={{ 
+                  background: 'none', 
+                  border: '1px solid var(--border-color)', 
+                  padding: '0.5rem 1rem',
+                  borderRadius: 'var(--border-radius-sm)',
+                  cursor: 'pointer',
+                  marginBottom: '1rem',
+                  width: '100%',
+                  fontSize: '0.9rem'
+                }}
+              >
+                {showSavedTranscripts ? 'Hide' : 'Show'} Saved Transcripts ({savedTranscripts.length})
+              </button>
+
+              {showSavedTranscripts && (
+                <div style={{ 
+                  background: 'var(--secondary-color)', 
+                  padding: '1rem', 
+                  borderRadius: 'var(--border-radius)',
+                  maxHeight: '300px',
+                  overflowY: 'auto'
+                }}>
+                  {savedTranscripts.map((transcript, index) => {
+                    // Try to extract episode title from the transcript data or URL
+                    const episodeTitle = transcript.title || 
+                                       episodes.find(ep => ep.audioUrl === transcript.audioUrl)?.title || 
+                                       'Unknown Episode';
+                    
+                    return (
+                      <div key={index} style={{ 
+                        background: 'white', 
+                        padding: '1rem', 
+                        marginBottom: '0.5rem',
+                        borderRadius: 'var(--border-radius-sm)',
+                        fontSize: '0.8rem',
+                        border: '1px solid var(--border-color)'
+                      }}>
+                        <div style={{ 
+                          fontWeight: '600', 
+                          marginBottom: '0.5rem',
+                          color: 'var(--text-primary)',
+                          lineHeight: '1.3'
+                        }}>
+                          {episodeTitle}
+                        </div>
+                        <div style={{ 
+                          marginBottom: '0.75rem', 
+                          color: 'var(--text-secondary)',
+                          fontSize: '0.7rem'
+                        }}>
+                          Transcribed: {new Date(transcript.timestamp).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const guid = transcript.audioUrl;
+                            setTranscripts(prev => ({ ...prev, [guid]: transcript.transcript }));
+                            setExpandedTranscripts(prev => ({ ...prev, [guid]: true }));
+                          }}
+                          style={{
+                            background: 'var(--primary-color)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: 'var(--border-radius-sm)',
+                            cursor: 'pointer',
+                            fontSize: '0.7rem',
+                            fontWeight: '500',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseOver={(e) => e.target.style.background = 'var(--primary-hover)'}
+                          onMouseOut={(e) => e.target.style.background = 'var(--primary-color)'}
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => {
+                            const content = formatTranscriptWithSpeakers(transcript.transcript);
+                            const blob = new Blob([content], { type: 'text/plain' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${transcript.title || episodeTitle || 'transcript'}.txt`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          }}
+                          style={{
+                            background: 'var(--text-secondary)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: 'var(--border-radius-sm)',
+                            cursor: 'pointer',
+                            fontSize: '0.7rem',
+                            fontWeight: '500',
+                            marginLeft: '0.5rem',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          Download
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
