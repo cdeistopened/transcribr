@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "cd frontend && npm install && npm run build",
-    "start:prod": "cd backend && npm install && node server.js",
+    "start:prod": "npm run build && cd backend && npm install && node server.js",
     "dev": "http-server public -p 8080",
     "backend": "node backend/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
