@@ -539,4 +539,5 @@ if (process.env.NODE_ENV === 'production') {
 
 app.listen(PORT, () => {
   console.log(`Backend listening on port ${PORT}`);
+  console.log(`Speaker diarization enabled via AssemblyAI`);
 });
