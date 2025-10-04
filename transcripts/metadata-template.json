@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "title": "Show Name: Episode Topic",
+    "subtitle": "Optional subtitle or specific focus",
+    "date": "YYYY-MM-DD",
+    "duration": "60 minutes",
+    "audio_url": "https://www.toxinless.com/episode-file.mp3",
+    "source_show": "Ask the Herb Doctor",
+    "episode_topic": "Specific topic if mentioned in episode",
+    "speakers": [
+      {
+        "name": "Dr. Raymond Peat",
+        "role": "Guest Expert",
+        "description": "Primary interviewee and health expert"
+      },
+      {
+        "name": "Andrew Murray",
+        "role": "Host",
+        "description": "Main host and interviewer"
+      },
+      {
+        "name": "Sarah Johannessen Murray",
+        "role": "Co-host",
+        "description": "Co-host and interviewer"
+      }
+    ],
+    "tags": [
+      "ray-peat",
+      "health",
+      "nutrition",
+      "hormones",
+      "metabolism",
+      "alternative-medicine"
+    ],
+    "categories": [
+      "Health",
+      "Nutrition",
+      "Endocrinology"
+    ],
+    "transcription_method": "OpenAI Whisper large",
+    "transcription_date": "2024-01-01T12:00:00Z",
+    "transcription_version": "1.0",
+    "quality_score": "A",
+    "accuracy_notes": "High accuracy with clear audio quality",
+    "speaker_diarization_applied": true,
+    "polishing_applied": false,
+    "notes": "Any special notes about audio quality, content, or processing"
+  },
+  "transcript": {
+    "text": "Full transcript text goes here...",
+    "segments": [
+      {
+        "id": 0,
+        "start": 0.0,
+        "end": 5.0,
+        "text": "Opening segment text...",
+        "speaker": "Andrew Murray",
+        "confidence": 0.95
+      }
+    ],
+    "word_count": 0,
+    "estimated_reading_time_minutes": 0
+  },
+  "quality_metrics": {
+    "language": "en",
+    "audio_quality": "Good",
+    "background_noise": "Minimal",
+    "speaker_clarity": "Clear",
+    "technical_issues": "None",
+    "overall_assessment": "High quality recording suitable for transcription"
+  },
+  "content_analysis": {
+    "main_topics": [
+      "Primary topic discussed",
+      "Secondary topic",
+      "Tertiary topic"
+    ],
+    "key_concepts": [
+      "Important concept 1",
+      "Important concept 2"
+    ],
+    "medical_terms": [
+      "Medical term 1",
+      "Medical term 2"
+    ],
+    "references": [
+      {
+        "type": "study",
+        "title": "Study title",
+        "author": "Author name",
+        "year": 2020
+      }
+    ],
+    "controversial_topics": [
+      "Topic that may be controversial"
+    ]
+  },
+  "processing_history": [
+    {
+      "step": "transcription",
+      "method": "OpenAI Whisper large",
+      "timestamp": "2024-01-01T12:00:00Z",
+      "success": true,
+      "notes": "Initial transcription completed successfully"
+    },
+    {
+      "step": "speaker_diarization",
+      "method": "Pattern matching",
+      "timestamp": "2024-01-01T13:00:00Z",
+      "success": true,
+      "notes": "Speaker identification applied"
+    }
+  ]
+}

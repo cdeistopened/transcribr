@@ -1,0 +1,14 @@
+{
+  "name": "transcription-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Batch transcription scripts for Ray Peat audio collection",
+  "scripts": {
+    "transcribe": "node transcribe_batch.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "rss-parser": "^3.12.0"
+  }
+}
+
