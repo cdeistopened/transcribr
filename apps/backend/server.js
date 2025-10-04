@@ -27,6 +27,30 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'Transcription API Server',
+    version: '2.0',
+    endpoints: {
+      rss: 'POST /api/rss',
+      transcribe: 'POST /api/transcribe',
+      transcripts: 'GET /api/transcripts',
+      findTranscript: 'GET /api/transcript/find'
+    }
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    assemblyai: !!process.env.ASSEMBLYAI_API_KEY,
+    deepgram: !!process.env.DEEPGRAM_API_KEY
+  });
+});
+
 // 1. Parse RSS feed and return episode metadata
 app.post('/api/rss', async (req, res) => {
   const { rssUrl } = req.body;
