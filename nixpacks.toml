@@ -1,16 +1,19 @@
-# Railway configuration for monorepo backend
-# Each phase must cd into apps/backend since working directory doesn't persist
+# Railway configuration for monorepo (backend + frontend)
+# Each phase must cd into the appropriate directory since working directory doesn't persist
 
 [phases.setup]
 nixPkgs = ["nodejs-18_x"]
 
 [phases.install]
 dependsOn = ["setup"]
-cmds = ["(cd apps/backend && npm install --omit=dev)"]
+cmds = [
+  "(cd apps/backend && npm install --omit=dev)",
+  "(cd apps/frontend && npm install)"
+]
 
 [phases.build]
-# No build step needed
+dependsOn = ["install"]
+cmds = ["(cd apps/frontend && npm run build)"]
 
 [start]
-cmd = "cd apps/backend && node server.js"
-
+cmd = "cd apps/backend && NODE_ENV=production node server.js"
