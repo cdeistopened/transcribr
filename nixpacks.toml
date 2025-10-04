@@ -1,6 +1,13 @@
-# Railway configuration for backend
-# Note: Set "Root Directory" to "apps/backend" in Railway dashboard
+# Railway configuration for monorepo backend
+# Working directory is apps/backend
+
+[phases.setup]
+nixPkgs = ["nodejs-18_x"]
+
+[phases.install]
+dependsOn = ["setup"]
+cmds = ["cd apps/backend && npm install --production"]
 
 [start]
-cmd = "node server.js"
+cmd = "cd apps/backend && node server.js"
 
