@@ -27,11 +27,13 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
-// Health check endpoint
-app.get('/', (req, res) => {
+// Health check endpoint (only for API, not root)
+app.get('/api/health', (req, res) => {
   res.json({ 
-    status: 'ok', 
-    message: 'Transcription API Server',
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    assemblyai: !!process.env.ASSEMBLYAI_API_KEY,
+    deepgram: !!process.env.DEEPGRAM_API_KEY,
     version: '2.0',
     endpoints: {
       rss: 'POST /api/rss',
@@ -39,15 +41,6 @@ app.get('/', (req, res) => {
       transcripts: 'GET /api/transcripts',
       findTranscript: 'GET /api/transcript/find'
     }
-  });
-});
-
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    assemblyai: !!process.env.ASSEMBLYAI_API_KEY,
-    deepgram: !!process.env.DEEPGRAM_API_KEY
   });
 });
 
